@@ -1,0 +1,14 @@
+hermes:
+  youtube:
+    api-key: "AIzaSyCsgT2m1s7Bf13I09RMwqwtBRVC2zaiIW8"
+    default-limit: 50
+  cohere:
+    api-key: "sPu7eVBooq0jdJ2ElmlxGoXTp8opizOg0KI7Zn5Q"
+
+server:
+  port: 8080
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: hermes-backend

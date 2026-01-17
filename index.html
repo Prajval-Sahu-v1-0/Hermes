@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes | A calmer way to collaborate</title>
+    <meta name="description"
+        content="Good collaborations come from the right people. Experience a calmer way to collaborate with Hermes.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div class="background-container">
+        <img src="assets/background.gif" alt="Background" class="bg-gif">
+        <div class="overlay"></div>
+    </div>
+
+    <!-- Revert Layer moved to body scope to catch only background clicks -->
+    <div id="layer" title="Click anywhere outside to hide the search"></div>
+
+    <nav id="navbar" class="navbar">
+        <div class="logo">Hermes</div>
+        <ul class="nav-links">
+            <li><a href="#about-hermes">How It Works</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><button class="btn btn-outline">Sign In</button></li>
+        </ul>
+
+        <!-- Mobile Menu Button (Profile Icon) -->
+        <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Open menu">
+            <i class="fas fa-user-circle"></i>
+        </button>
+    </nav>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-nav-overlay" class="mobile-nav-overlay"></div>
+    <div id="mobile-nav" class="mobile-nav">
+        <div class="mobile-nav-header">
+            <div class="mobile-nav-profile">
+                <i class="fas fa-user-circle"></i>
+                <span>Guest User</span>
+            </div>
+            <button id="mobile-nav-close" class="mobile-nav-close" aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="#about-hermes"><i class="fas fa-info-circle"></i> How It Works</a></li>
+            <li><a href="#features"><i class="fas fa-star"></i> Features</a></li>
+            <li><a href="#"><i class="fas fa-book"></i> Documentation</a></li>
+            <li><a href="#"><i class="fas fa-life-ring"></i> Support</a></li>
+        </ul>
+        <div class="mobile-nav-footer">
+            <button class="btn btn-primary mobile-nav-signin">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+        </div>
+    </div>
+
+    <main class="hero">
+        <div class="glass-card">
+            <span class="tagline">A calmer way to collaborate</span>
+            <h1 class="main-message">Good collaborations come from the right people.</h1>
+            <p class="sub-text">Connect with the creators who share your vision and values. No noise, just focus.</p>
+
+            <div class="cta-group">
+                <div id="app-cover">
+                    <div id="app">
+                        <form method="get" action="">
+                            <div id="f-element">
+                                <div id="inp-cover">
+                                    <button type="button" id="filter-toggle-btn" title="Toggle Filters">
+                                        <i class="fas fa-filter"></i>
+                                    </button>
+                                    <input id="search-input" type="text" name="query"
+                                        placeholder="Type something to search ..." autocomplete="off">
+                                    <button id="search-btn" type="submit" class="hidden">
+                                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20"
+                                            height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        <svg class="spinner-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20"
+                                            height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="submit" class="shadow"><i class="fas fa-search"></i></button>
+                        </form>
+                    </div>
+                    <!-- Moved #layer out of here -->
+                    <div id="init"></div>
+                </div>
+                <a href="#about-hermes" class="btn btn-secondary">Learn More</a>
+            </div>
+
+            <!-- Integrated Amazon-style Filter Panel -->
+            <div id="filter-wrapper">
+                <div id="active-filters" class="chips-container"></div>
+                <div id="filter-panel" class="amazon-filter-panel">
+                    <div class="filter-sidebar">
+                        <div class="filter-categories">
+                            <!-- Categories injected here -->
+                        </div>
+                    </div>
+                    <div class="filter-main">
+                        <div class="filter-options-content">
+                            <!-- Options injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Phase One: Query Generation Display -->
+            <div id="query-generation-display" class="hidden">
+                <p class="query-label">Generated Research Queries:</p>
+                <div id="generated-queries" class="query-chips-container"></div>
+            </div>
+
+            <!-- Search Results Section -->
+            <div id="results-section" class="hidden">
+                <div id="results-grid" class="results-grid"></div>
+                <div id="pagination-controls" class="pagination-controls"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- About Hermes Section -->
+    <section id="about-hermes" class="about-section">
+        <div class="about-container">
+            <div class="about-header">
+                <span class="about-badge">What is Hermes?</span>
+                <h2 class="about-title">A Discovery Tool, Not an Agent</h2>
+                <p class="about-subtitle">
+                    Hermes helps you find the right creators to collaborate with—without the noise,
+                    the guesswork, or the endless scrolling.
+                </p>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="about-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Smart Discovery</h3>
+                    <p>
+                        Describe the kind of creator you're looking for, and Hermes generates
+                        targeted search queries to surface the best matches across YouTube.
+                    </p>
+                </div>
+
+                <div class="about-card">
+                    <div class="about-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Qualitative Insights</h3>
+                    <p>
+                        Instead of raw numbers, you see human-readable labels like "High engagement"
+                        or "Recently active"—so you understand the creator at a glance.
+                    </p>
+                </div>
+
+                <div class="about-card">
+                    <div class="about-icon">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <h3>Your Search, Your Control</h3>
+                    <p>
+                        Hermes doesn't make decisions for you. It presents ranked results based on
+                        your criteria. You decide who to reach out to.
+                    </p>
+                </div>
+            </div>
+
+            <div class="about-clarification">
+                <div class="clarification-box">
+                    <div class="clarification-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="clarification-content">
+                        <h4>Hermes is a tool, not an agent.</h4>
+                        <p>
+                            We don't negotiate, manage, or represent creators. Hermes is designed to
+                            streamline your search and surface relevant creators—everything else is up to you.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-workflow">
+                <h3 class="workflow-title">How It Works</h3>
+                <div class="workflow-steps">
+                    <div class="workflow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Describe Your Ideal Creator</h4>
+                            <p>Enter a genre, style, or niche—like "indie music" or "tech reviews".</p>
+                        </div>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>AI Expands Your Search</h4>
+                            <p>Hermes generates multiple research queries to find diverse, relevant creators.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Review Ranked Results</h4>
+                            <p>Browse creators sorted by relevance with qualitative labels, not just numbers.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Take Action</h4>
+                            <p>You keep full control. Reach out to the creators that match your vision.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- Brand Column -->
+                <div class="footer-brand">
+                    <div class="footer-logo">Hermes</div>
+                    <p class="footer-tagline">A calmer way to collaborate. Find the right creators without the noise.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#about-hermes">How It Works</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#why-hermes">Why Hermes</a></li>
+                    </ul>
+                </div>
+
+                <!-- Resources -->
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Hermes. Built for meaningful connections.</p>
+                <p class="footer-disclaimer">Hermes is a discovery tool, not a talent agency.</p>
+            </div>
+        </div>
+    </footer>
+    <button id="back-to-top" class="back-top hidden">↑</button>
+    <script src="search.js"></script>
+    <script src="filters.js"></script>
+</body>
+
+</html>
