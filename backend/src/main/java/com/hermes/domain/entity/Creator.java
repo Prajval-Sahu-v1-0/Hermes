@@ -54,6 +54,25 @@ public class Creator {
     @Column(name = "content_category")
     private String contentCategory;
 
+    // Embedding fields for vector scoring (one-time LLM ingestion)
+    @Column(name = "profile_embedding", columnDefinition = "FLOAT8[]")
+    private double[] profileEmbedding;
+
+    @Column(name = "embedding_model", length = 50)
+    private String embeddingModel;
+
+    @Column(name = "embedding_created_at")
+    private Instant embeddingCreatedAt;
+
+    @Column(name = "compressed_bio", length = 500)
+    private String compressedBio;
+
+    @Column(name = "content_tags", columnDefinition = "VARCHAR(50)[]")
+    private String[] contentTags;
+
+    @Column(name = "ingestion_status", length = 20)
+    private String ingestionStatus = "pending";
+
     // Lifecycle
     @Column(name = "discovered_at", nullable = false, updatable = false)
     private Instant discoveredAt;
@@ -221,5 +240,54 @@ public class Creator {
 
     public void setSource(Source source) {
         this.source = source;
+    }
+
+    // Embedding getters and setters
+    public double[] getProfileEmbedding() {
+        return profileEmbedding;
+    }
+
+    public void setProfileEmbedding(double[] profileEmbedding) {
+        this.profileEmbedding = profileEmbedding;
+    }
+
+    public String getEmbeddingModel() {
+        return embeddingModel;
+    }
+
+    public void setEmbeddingModel(String embeddingModel) {
+        this.embeddingModel = embeddingModel;
+    }
+
+    public Instant getEmbeddingCreatedAt() {
+        return embeddingCreatedAt;
+    }
+
+    public void setEmbeddingCreatedAt(Instant embeddingCreatedAt) {
+        this.embeddingCreatedAt = embeddingCreatedAt;
+    }
+
+    public String getCompressedBio() {
+        return compressedBio;
+    }
+
+    public void setCompressedBio(String compressedBio) {
+        this.compressedBio = compressedBio;
+    }
+
+    public String[] getContentTags() {
+        return contentTags;
+    }
+
+    public void setContentTags(String[] contentTags) {
+        this.contentTags = contentTags;
+    }
+
+    public String getIngestionStatus() {
+        return ingestionStatus;
+    }
+
+    public void setIngestionStatus(String ingestionStatus) {
+        this.ingestionStatus = ingestionStatus;
     }
 }

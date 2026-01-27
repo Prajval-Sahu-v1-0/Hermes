@@ -55,111 +55,35 @@ $(function () {
 
     // --- Search Logic Integration ---
     const form = $("#app form");
-    const queryDisplay = $("#query-generation-display");
-    const generatedQueriesContainer = $("#generated-queries");
-    const resultsSection = $("#results-section");
-    const resultsGrid = $("#results-grid");
 
     form.on("submit", function (e) {
         e.preventDefault();
         const query = input.val().trim();
         if (!query) return;
 
-        // Visual feedback for search
-        performSearch(query);
+        // Navigate to results page
+        navigateToResults(query);
     });
 
-    async function performSearch(genre) {
-        // Show loader
+    /**
+     * Navigate to the results page with the search query.
+     * Stores query in sessionStorage and redirects.
+     */
+    function navigateToResults(query) {
+        // Show loader while transitioning
         if (window.showLoader) window.showLoader();
 
-        try {
-            const response = await fetch("http://127.0.0.1:8080/api/v1/search", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    genre: genre,
-                    platform: "youtube",
-                    page: 0,
-                    filters: typeof gatherFilters === 'function' ? gatherFilters() : {}
-                }),
-            });
+        // Store query for the results page
+        sessionStorage.setItem('hermes:query', query);
 
-            if (!response.ok) throw new Error("Search failed");
-
-            const data = await response.json();
-            renderResults(data);
-        } catch (error) {
-            console.error("Error performing search:", error);
-            alert("Something went wrong with the search. Is the backend running?");
-        } finally {
-            // Hide loader
-            if (window.hideLoader) window.hideLoader();
-        }
+        // Small delay for visual feedback, then navigate
+        setTimeout(function () {
+            window.location.href = 'results.html?q=' + encodeURIComponent(query);
+        }, 300);
     }
 
-    function renderResults(data) {
-        // 1. Render Generated Queries (Phase One Demonstration)
-        generatedQueriesContainer.empty();
-        if (data.queryInfo && data.queryInfo.queries) {
-            data.queryInfo.queries.forEach(q => {
-                generatedQueriesContainer.append(`<span class="query-chip">${q}</span>`);
-            });
-            queryDisplay.removeClass("hidden");
-        } else {
-            queryDisplay.addClass("hidden");
-        }
-
-        // 2. Render Creator Profiles (Phase Two Simulation/Output)
-        resultsGrid.empty();
-        if (data.results && data.results.length > 0) {
-            data.results.forEach(creator => {
-                resultsGrid.append(createCreatorCard(creator));
-            });
-            resultsSection.removeClass("hidden");
-        } else {
-            resultsGrid.append('<p class="no-results">No creators found for this genre.</p>');
-            resultsSection.removeClass("hidden");
-        }
-    }
-
-    function createCreatorCard(creator) {
-        return `
-            <div class="creator-card">
-                <div class="creator-header">
-                    <img src="${creator.avatarUrl}" alt="${creator.name}" class="creator-avatar">
-                    <div class="creator-info">
-                        <h3>${creator.name}</h3>
-                        <span class="creator-handle">${creator.handle || ""}</span>
-                    </div>
-                </div>
-                <div class="creator-stats">
-                    <div class="stat-item">
-                        <span class="stat-value">${formatNumber(creator.subscribers)}</span>
-                        <span class="stat-label">Subs</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value">${formatNumber(creator.videos)}</span>
-                        <span class="stat-label">Videos</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value">${formatNumber(creator.views / 1000000)}M</span>
-                        <span class="stat-label">Views</span>
-                    </div>
-                </div>
-                <p class="creator-desc">${creator.description || "No description available."}</p>
-            </div>
-        `;
-    }
-
-    function formatNumber(num) {
-        if (!num) return "0";
-        if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
-        if (num >= 1000) return (num / 1000).toFixed(1) + "K";
-        return num.toString();
-    }
+    // Expose for external use
+    window.navigateToResults = navigateToResults;
 
     // --- UI Enhancements ---
 
@@ -184,7 +108,7 @@ $(function () {
             e.preventDefault();
             const query = searchInput.value.trim();
             if (query) {
-                performSearch(query);
+                navigateToResults(query);
             }
         });
     }
@@ -273,4 +197,5 @@ $(function () {
         link.addEventListener('click', closeMobileNav);
     });
 });
+
 

@@ -69,6 +69,34 @@ public class RankingService {
     }
 
     /**
+     * Merge, deduplicate, and rank creators WITHOUT pagination.
+     * Used for session materialization where full list is stored.
+     * 
+     * @param queryResults Map of query to graded creators
+     * @return Full ranked, deduplicated list (no pagination)
+     */
+    public List<GradedCreator> mergeAndRank(Map<String, List<GradedCreator>> queryResults) {
+        if (queryResults == null || queryResults.isEmpty()) {
+            return List.of();
+        }
+
+        // Step 1: Merge all creators across queries
+        List<GradedCreator> allCreators = mergeCreators(queryResults);
+        log.debug("[Ranking] Merged {} creators from {} queries",
+                allCreators.size(), queryResults.size());
+
+        // Step 2: Deduplicate by channelId (keep highest score, merge labels)
+        List<GradedCreator> deduplicated = deduplicateCreators(allCreators);
+        log.debug("[Ranking] Deduplicated to {} unique creators", deduplicated.size());
+
+        // Step 3: Sort by finalScore (descending)
+        List<GradedCreator> ranked = rankCreators(deduplicated);
+        log.info("[Ranking] Returning {} ranked creators for materialization", ranked.size());
+
+        return ranked;
+    }
+
+    /**
      * Merges all graded creators from multiple queries into a single list.
      */
     private List<GradedCreator> mergeCreators(Map<String, List<GradedCreator>> queryResults) {

@@ -48,12 +48,28 @@ public final class GenreRelevanceScorer {
         // Calculate base score from keyword overlap
         double overlapRatio = (double) matches / genreKeywords.size();
 
-        // Apply boost for exact genre match in channel name
+        // Quality boost: Reward channels with substantive descriptions
+        // This helps prioritize actual creators over channels that just have the query
+        // in their name
+        int descriptionLength = description != null ? description.length() : 0;
+        double qualityBoost = 0.0;
+        if (descriptionLength > 500) {
+            qualityBoost = 0.15; // Substantial description = likely a real creator
+        } else if (descriptionLength > 200) {
+            qualityBoost = 0.08; // Decent description
+        } else if (descriptionLength > 50) {
+            qualityBoost = 0.03; // Minimal description
+        }
+        // Channels with very short/no descriptions (often just name-match results) get
+        // no boost
+
+        // Small boost for name match (reduced from 0.3 to 0.05 to avoid
+        // over-prioritizing)
         if (channelName != null && normalize(channelName).contains(normalize(baseGenre))) {
-            overlapRatio = Math.min(1.0, overlapRatio + 0.3);
+            qualityBoost += 0.05;
         }
 
-        return Math.min(1.0, overlapRatio);
+        return Math.min(1.0, overlapRatio + qualityBoost);
     }
 
     /**

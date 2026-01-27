@@ -1,0 +1,79 @@
+# ═══════════════════════════════════════════════════════════
+# Hermes Configuration Template
+# ═══════════════════════════════════════════════════════════
+# INSTRUCTIONS:
+# 1. Copy this file to application.properties
+# 2. Replace all placeholder values with your actual credentials
+# 3. NEVER commit application.properties to version control
+# ═══════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────
+# PostgreSQL Database
+# ─────────────────────────────────────────────────────────────
+spring.datasource.url=jdbc:postgresql://localhost:5432/Hermes
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
+
+# JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.show-sql=false
+spring.jpa.open-in-view=false
+
+# ─────────────────────────────────────────────────────────────
+# YouTube API Configuration
+# ─────────────────────────────────────────────────────────────
+# Get keys from: https://console.cloud.google.com/apis/credentials
+# Comma-separated for rotation when quota is exceeded
+hermes.youtube.api-keys=YOUR_YOUTUBE_API_KEY_1,YOUR_YOUTUBE_API_KEY_2
+
+# YouTube Quota Optimization
+hermes.youtube.max-queries-per-search=5
+hermes.youtube.max-results-per-query=50
+hermes.youtube.max-channel-batch=50
+hermes.youtube.daily-quota=10000
+hermes.youtube.downgrade-threshold=0.8
+
+# ─────────────────────────────────────────────────────────────
+# Cohere API Configuration
+# ─────────────────────────────────────────────────────────────
+# Get key from: https://dashboard.cohere.com/api-keys
+hermes.cohere.api-key=YOUR_COHERE_API_KEY
+
+# LLM Token Budget Configuration
+hermes.llm.daily-token-budget=1000000
+hermes.llm.per-request-budget=2000
+hermes.llm.fallback-threshold=0.9
+
+# ─────────────────────────────────────────────────────────────
+# Cache Configuration
+# ─────────────────────────────────────────────────────────────
+hermes.cache.l2-ttl-hours=24
+hermes.cache.embedding-ttl-days=7
+
+# Search Session Configuration
+hermes.session.ttl-minutes=30
+hermes.session.sliding-expiration=true
+
+# ─────────────────────────────────────────────────────────────
+# OPTIONAL: Platform Enrichment Features
+# ─────────────────────────────────────────────────────────────
+# These are disabled by default. Enable only if you have credentials.
+
+# Reddit Enrichment
+hermes.features.reddit.enrichment.enabled=false
+hermes.reddit.client-id=
+hermes.reddit.client-secret=
+
+# Instagram Enrichment
+hermes.features.instagram.enrichment.enabled=false
+hermes.instagram.access-token=
+
+# Twitter/X Enrichment
+hermes.features.twitter.enrichment.enabled=false
+hermes.twitter.bearer-token=
+
+# Twitch Enrichment
+hermes.features.twitch.enrichment.enabled=false
+hermes.twitch.client-id=
+hermes.twitch.client-secret=

@@ -69,6 +69,14 @@ public final class LabelGenerator {
             labels.add("Inactive recently");
         }
 
+        // Competitiveness labels - based on combined strength in genre
+        // Competitiveness = weighted combination of audience, engagement, and activity
+        double competitiveness = calculateCompetitiveness(score);
+        String competitivenessLabel = getCompetitivenessLabel(competitiveness);
+        if (competitivenessLabel != null) {
+            labels.add(competitivenessLabel);
+        }
+
         // Overall score labels
         if (score.finalScore() >= 0.8) {
             labels.add("Top match");
@@ -77,5 +85,35 @@ public final class LabelGenerator {
         }
 
         return labels;
+    }
+
+    /**
+     * Calculates competitiveness score from audience, engagement, and activity.
+     * 
+     * Competitiveness reflects how strongly a creator competes in their genre:
+     * - Audience size (40%): Larger audiences = more competitive
+     * - Engagement quality (35%): Higher engagement = more competitive
+     * - Activity consistency (25%): More consistent = more competitive
+     */
+    private static double calculateCompetitiveness(CreatorScore score) {
+        return (score.audienceFit() * 0.40) +
+                (score.engagementQuality() * 0.35) +
+                (score.activityConsistency() * 0.25);
+    }
+
+    /**
+     * Maps competitiveness score to tier label.
+     */
+    private static String getCompetitivenessLabel(double competitiveness) {
+        if (competitiveness >= 0.80) {
+            return "Dominant"; // Top performers who dominate the genre
+        } else if (competitiveness >= 0.60) {
+            return "Established"; // Well-known creators in the genre
+        } else if (competitiveness >= 0.40) {
+            return "Growing"; // Creators building momentum
+        } else if (competitiveness >= 0.20) {
+            return "Emerging"; // New creators just starting out
+        }
+        return null; // Below threshold, no label
     }
 }

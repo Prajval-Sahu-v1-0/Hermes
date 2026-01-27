@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Creators | Hermes</title>
+    <meta name="description"
+        content="Find the right creators to collaborate with. Hermes - A calmer way to collaborate.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="results.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body class="workspace-layout">
+    <!-- Background -->
+    <div class="results-background">
+        <div class="bg-gradient"></div>
+    </div>
+
+    <!-- Expandable Dashboard (collapsed by default) -->
+    <aside id="sidebar" class="sidebar glass-card collapsed">
+        <div class="sidebar-header">
+            <button id="sidebar-collapse-toggle" class="sidebar-toggle-btn" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="sidebar-logo">Hermes</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-page="discover">
+                <i class="fas fa-compass"></i>
+                <span class="nav-label">Discover</span>
+            </button>
+
+            <!-- Search Filters Section -->
+            <button class="nav-item nav-item-expandable" id="filters-toggle" data-page="filters">
+                <i class="fas fa-filter"></i>
+                <span class="nav-label">Search Filters</span>
+                <i class="fas fa-chevron-down expand-arrow"></i>
+            </button>
+            <div id="sidebar-filter-panel" class="sidebar-filter-panel">
+                <!-- Filter Categories with Sub-panels -->
+                <div class="filter-category-list">
+                    <!-- Each category is a collapsible item with its own sub-panel -->
+                    <div class="filter-category-group" data-category="platform">
+                        <button class="filter-category-header">
+                            <i class="fas fa-globe"></i>
+                            <span>Platform</span>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </button>
+                        <div class="filter-category-options"></div>
+                    </div>
+                    <div class="filter-category-group" data-category="genre">
+                        <button class="filter-category-header">
+                            <i class="fas fa-tags"></i>
+                            <span>Genre</span>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </button>
+                        <div class="filter-category-options"></div>
+                    </div>
+                    <div class="filter-category-group" data-category="audience">
+                        <button class="filter-category-header">
+                            <i class="fas fa-users"></i>
+                            <span>Audience</span>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </button>
+                        <div class="filter-category-options"></div>
+                    </div>
+                    <div class="filter-category-group" data-category="engagement">
+                        <button class="filter-category-header">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Engagement</span>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </button>
+                        <div class="filter-category-options"></div>
+                    </div>
+                    <div class="filter-category-group" data-category="competitiveness">
+                        <button class="filter-category-header">
+                            <i class="fas fa-trophy"></i>
+                            <span>Competitiveness</span>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </button>
+                        <div class="filter-category-options"></div>
+                    </div>
+                    <div class="filter-category-group" data-category="activity">
+                        <button class="filter-category-header">
+                            <i class="fas fa-clock"></i>
+                            <span>Activity</span>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </button>
+                        <div class="filter-category-options"></div>
+                    </div>
+                    <div class="filter-category-group" data-category="style">
+                        <button class="filter-category-header">
+                            <i class="fas fa-handshake"></i>
+                            <span>Style</span>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </button>
+                        <div class="filter-category-options"></div>
+                    </div>
+                    <div class="filter-category-group" data-category="location">
+                        <button class="filter-category-header">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Location</span>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </button>
+                        <div class="filter-category-options"></div>
+                    </div>
+                </div>
+                <!-- Active Filters Summary -->
+                <div id="sidebar-active-filters" class="sidebar-active-filters"></div>
+            </div>
+
+            <button class="nav-item" data-page="saved">
+                <i class="fas fa-bookmark"></i>
+                <span class="nav-label">Saved</span>
+            </button>
+            <button class="nav-item" data-page="history">
+                <i class="fas fa-history"></i>
+                <span class="nav-label">History</span>
+            </button>
+            <button class="nav-item" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span class="nav-label">Settings</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="index.html" class="back-home">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Home</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- Main Workspace Area -->
+    <div class="workspace-main">
+        <!-- Top Search Section - Simplified Original Design -->
+        <section class="top-search">
+            <div class="results-search-box">
+                <form id="search-form" class="search-form">
+                    <div class="search-input-wrapper">
+                        <input id="search-input" type="text" name="query"
+                            placeholder="Search creators by genre, style, or niche..." autocomplete="off">
+                    </div>
+                    <button type="submit" class="search-submit-btn">
+                        <i class="fas fa-search search-icon-visible"></i>
+                        <i class="fas fa-spinner fa-spin search-spinner hidden"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Results Header -->
+        <section class="results-header">
+            <div class="results-info">
+                <h1 class="results-title">
+                    <span id="query-display">Results</span>
+                </h1>
+                <p class="results-count" id="results-count">Loading...</p>
+            </div>
+            <div class="results-actions">
+                <!-- Custom Dropdown (replaces native select) -->
+                <div class="custom-dropdown" id="sort-dropdown">
+                    <button class="dropdown-trigger" id="sort-trigger">
+                        <span class="dropdown-value">Most Relevant</span>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </button>
+                    <div class="dropdown-menu" id="sort-menu">
+                        <div class="dropdown-option selected" data-value="relevance">Most Relevant</div>
+                        <div class="dropdown-option" data-value="subscribers">Most Subscribers</div>
+                        <div class="dropdown-option" data-value="engagement">Highest Engagement</div>
+                        <div class="dropdown-option" data-value="recent">Recently Active</div>
+                    </div>
+                </div>
+                <!-- Hidden select for form compatibility -->
+                <select id="sort-select" class="sort-select" style="display: none;">
+                    <option value="relevance">Most Relevant</option>
+                    <option value="subscribers">Most Subscribers</option>
+                    <option value="engagement">Highest Engagement</option>
+                    <option value="recent">Recently Active</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Pinterest-Style Masonry Grid -->
+        <section class="results-area">
+            <div id="results-grid" class="masonry-grid">
+                <!-- Creator cards will be injected here -->
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Discovering creators...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state hidden">
+                <div class="empty-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>No creators found</h3>
+                <p>Try adjusting your search or filters</p>
+            </div>
+        </section>
+
+        <!-- Pagination -->
+        <section id="pagination" class="pagination hidden">
+            <button class="pagination-btn" id="prev-page" disabled>
+                <i class="fas fa-chevron-left"></i>
+                Previous
+            </button>
+            <span class="pagination-info" id="pagination-info">Page 1 of 1</span>
+            <button class="pagination-btn" id="next-page">
+                Next
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </section>
+    </div>
+
+    <script src="results.js"></script>
+</body>
+
+</html>
