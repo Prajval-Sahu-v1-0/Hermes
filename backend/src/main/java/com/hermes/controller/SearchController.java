@@ -187,7 +187,10 @@ public class SearchController {
                                 r.getProfileImageUrl(),
                                 "youtube",
                                 score,
-                                r.getLabels() != null ? java.util.Arrays.asList(r.getLabels()) : java.util.List.of());
+                                r.getLabels() != null ? java.util.Arrays.asList(r.getLabels()) : java.util.List.of(),
+                                r.getSubscriberCount(),
+                                0L,
+                                r.getLastVideoDate());
         }
 
         /**

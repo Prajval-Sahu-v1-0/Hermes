@@ -2,6 +2,7 @@ package com.hermes.domain.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -52,8 +53,14 @@ public class SearchSessionResult {
     @Column(name = "competitiveness_score")
     private double competitivenessScore;
 
+    @Column(name = "subscriber_count")
+    private long subscriberCount;
+
     @Column(columnDefinition = "TEXT[]")
     private String[] labels;
+
+    @Column(name = "last_video_date")
+    private Instant lastVideoDate;
 
     // Constructors
     public SearchSessionResult() {
@@ -168,12 +175,28 @@ public class SearchSessionResult {
         this.competitivenessScore = competitivenessScore;
     }
 
+    public long getSubscriberCount() {
+        return subscriberCount;
+    }
+
+    public void setSubscriberCount(long subscriberCount) {
+        this.subscriberCount = subscriberCount;
+    }
+
     public String[] getLabels() {
         return labels;
     }
 
     public void setLabels(String[] labels) {
         this.labels = labels;
+    }
+
+    public Instant getLastVideoDate() {
+        return lastVideoDate;
+    }
+
+    public void setLastVideoDate(Instant lastVideoDate) {
+        this.lastVideoDate = lastVideoDate;
     }
 
     /**

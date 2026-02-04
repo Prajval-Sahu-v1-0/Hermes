@@ -86,9 +86,9 @@ public interface SearchSessionResultRepository
                         Pageable pageable);
 
         /**
-         * Offset-based pagination sorted by audience fit (subscribers).
+         * Offset-based pagination sorted by subscriber count (raw).
          */
-        @Query("SELECT r FROM SearchSessionResult r WHERE r.sessionId = :sessionId ORDER BY r.audienceFit DESC, r.rank ASC")
+        @Query("SELECT r FROM SearchSessionResult r WHERE r.sessionId = :sessionId ORDER BY r.subscriberCount DESC, r.rank ASC")
         List<SearchSessionResult> findBySessionIdOrderBySubscribersDesc(
                         @Param("sessionId") UUID sessionId,
                         Pageable pageable);
@@ -102,9 +102,9 @@ public interface SearchSessionResultRepository
                         Pageable pageable);
 
         /**
-         * Offset-based pagination sorted by activity consistency.
+         * Offset-based pagination sorted by last video date (Recently Active).
          */
-        @Query("SELECT r FROM SearchSessionResult r WHERE r.sessionId = :sessionId ORDER BY r.activityConsistency DESC, r.rank ASC")
+        @Query("SELECT r FROM SearchSessionResult r WHERE r.sessionId = :sessionId ORDER BY r.lastVideoDate DESC NULLS LAST, r.rank ASC")
         List<SearchSessionResult> findBySessionIdOrderByActivityDesc(
                         @Param("sessionId") UUID sessionId,
                         Pageable pageable);

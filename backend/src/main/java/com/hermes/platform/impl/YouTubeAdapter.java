@@ -197,6 +197,7 @@ public class YouTubeAdapter implements PlatformAdapter {
                 List.of(), // Categories to be enriched if needed
                 snippet.getCountry(),
                 new HashMap<>(), // Labels set later by ScoringEngine/Service
-                0.0);
+                0.0,
+                null); // lastVideoDate fetched separately by YouTubeSearchService
     }
 }

@@ -242,7 +242,8 @@ public class CreatorIngestionService {
                 List.of(),
                 creator.getCountry(),
                 new java.util.HashMap<>(),
-                0.0);
+                0.0,
+                null); // lastVideoDate not available from Creator entity
     }
 
     private String truncate(String text, int maxLength) {

@@ -1216,10 +1216,10 @@
 
                 case 'engagement':
                     // Sort by engagement score (descending)
-                    // Use engagementQuality from backend or calculate from labels
-                    const engageA = a.engagementQuality || a.engagement ||
+                    // Use engagementQuality from backend score object or fallback
+                    const engageA = a.score?.engagementQuality || a.engagementQuality || a.engagement ||
                         (a.labels?.includes('High engagement') ? 1 : 0);
-                    const engageB = b.engagementQuality || b.engagement ||
+                    const engageB = b.score?.engagementQuality || b.engagementQuality || b.engagement ||
                         (b.labels?.includes('High engagement') ? 1 : 0);
                     return engageB - engageA;
 

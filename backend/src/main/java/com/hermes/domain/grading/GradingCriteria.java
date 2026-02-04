@@ -41,11 +41,12 @@ public record GradingCriteria(
 
     /**
      * Engagement quality preference.
+     * Values represent normalized engagement score ranges [0.0, 1.0].
      */
     public enum EngagementQuality {
-        LOW(0.0, 50.0),
-        MEDIUM(50.0, 200.0),
-        HIGH(200.0, Double.MAX_VALUE);
+        LOW(0.0, 0.4), // Below 0.4 normalized score
+        MEDIUM(0.4, 0.75), // 0.4 to 0.75 normalized score
+        HIGH(0.75, 1.0); // 0.75+ normalized score
 
         private final double minRatio;
         private final double maxRatio;

@@ -217,7 +217,10 @@ public class SearchService {
                                 result.getProfileImageUrl(),
                                 "youtube",
                                 score,
-                                result.getLabels() != null ? List.of(result.getLabels()) : List.of());
+                                result.getLabels() != null ? List.of(result.getLabels()) : List.of(),
+                                result.getSubscriberCount(),
+                                0L,
+                                result.getLastVideoDate());
         }
 
         private int estimateYouTubeQuota(int queryCount, QueryResultsMap results) {
@@ -338,7 +341,10 @@ public class SearchService {
                                 profile.profileImageUrl(),
                                 "youtube",
                                 score,
-                                labels);
+                                labels,
+                                profile.subscriberCount(),
+                                profile.viewCount(),
+                                profile.lastVideoDate());
         }
 
         /**
@@ -406,16 +412,18 @@ public class SearchService {
         private double calculateEngagementScore(long viewCount, long subscriberCount) {
                 if (subscriberCount == 0)
                         return 0.5;
+
+                // Calculate views per subscriber as engagement proxy
                 double viewsPerSub = (double) viewCount / subscriberCount;
-                if (viewsPerSub >= 100)
-                        return 1.0;
-                if (viewsPerSub >= 50)
-                        return 0.8;
-                if (viewsPerSub >= 20)
-                        return 0.6;
-                if (viewsPerSub >= 10)
-                        return 0.5;
-                return 0.4;
+
+                // Use sigmoid normalization for continuous scoring (0.0 to 1.0)
+                // Midpoint at 50 views/sub, steepness of 0.05
+                // This ensures creators are properly ordered by their actual engagement rate
+                double midpoint = 50.0;
+                double steepness = 0.05;
+                double normalizedScore = 1.0 / (1.0 + Math.exp(-steepness * (viewsPerSub - midpoint)));
+
+                return normalizedScore;
         }
 
         private double calculateActivityScore(long videoCount) {

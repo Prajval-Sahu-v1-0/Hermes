@@ -1566,6 +1566,28 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Engagement Score Badge - Shows when sorting by Highest Engagement */
+.engagement-score-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 100px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.25), rgba(255, 154, 53, 0.2));
+    color: #ff9a35;
+    border: 1px solid rgba(255, 154, 53, 0.4);
+    box-shadow: 0 0 12px rgba(255, 107, 53, 0.2);
+    margin-left: 0.5rem;
+}
+
+.engagement-score-badge i {
+    color: #ff6b35;
+    font-size: 0.75rem;
+}
+
 /* Explainability Labels */
 .creator-explain {
     display: flex;

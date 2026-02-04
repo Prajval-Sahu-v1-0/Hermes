@@ -187,6 +187,12 @@ public class SearchSessionService {
             double competitiveness = CompetitivenessScorer.computeFromScore(creator.score());
             result.setCompetitivenessScore(competitiveness);
 
+            // Store raw subscriber count for "Most Subscribers" sorting
+            result.setSubscriberCount(creator.subscriberCount());
+
+            // Store last video date for "Recently Active" sorting
+            result.setLastVideoDate(creator.lastVideoDate());
+
             results.add(result);
         }
 
@@ -486,11 +492,13 @@ public class SearchSessionService {
         java.util.Comparator<SearchSessionResult> comparator = switch (sortKey) {
             case FINAL_SCORE -> java.util.Comparator.comparingDouble(SearchSessionResult::getScore).reversed();
             case RELEVANCE -> java.util.Comparator.comparingDouble(SearchSessionResult::getGenreRelevance).reversed();
-            case SUBSCRIBERS -> java.util.Comparator.comparingDouble(SearchSessionResult::getAudienceFit).reversed();
+            case SUBSCRIBERS -> java.util.Comparator.comparingLong(SearchSessionResult::getSubscriberCount).reversed();
             case ENGAGEMENT ->
                 java.util.Comparator.comparingDouble(SearchSessionResult::getEngagementQuality).reversed();
             case ACTIVITY ->
-                java.util.Comparator.comparingDouble(SearchSessionResult::getActivityConsistency).reversed();
+                java.util.Comparator.comparing(
+                        SearchSessionResult::getLastVideoDate,
+                        java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()));
             case COMPETITIVENESS ->
                 java.util.Comparator.comparingDouble(SearchSessionResult::getCompetitivenessScore).reversed();
         };

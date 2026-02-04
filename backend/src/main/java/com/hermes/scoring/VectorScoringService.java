@@ -276,7 +276,10 @@ public class VectorScoringService {
                 creator.getProfileImageUrl(),
                 creator.getPlatform(),
                 score,
-                labels);
+                labels,
+                0L, // subscriberCount not available from Creator entity
+                0L, // viewCount not available from Creator entity
+                null); // lastVideoDate not available from Creator entity
     }
 
     private record ScoredCreator(

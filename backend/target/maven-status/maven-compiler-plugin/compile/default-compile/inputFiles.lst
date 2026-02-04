@@ -40,6 +40,7 @@ D:\Documents\Hermes\backend\src\main\java\com\hermes\service\SearchSessionServic
 D:\Documents\Hermes\backend\src\main\java\com\hermes\platform\RedditEnrichmentService.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\repository\QueryCacheRepository.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\service\SortingService.java
+D:\Documents\Hermes\backend\src\main\java\com\hermes\domain\grading\VideoStatistics.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\service\YouTubeEnrichmentService.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\ingestion\CreatorIngestionService.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\repository\CreatorRepository.java

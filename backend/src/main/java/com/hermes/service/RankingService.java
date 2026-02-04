@@ -140,7 +140,10 @@ public class RankingService {
                             original.profileImageUrl(),
                             original.platform(),
                             original.score(),
-                            new ArrayList<>(allLabels));
+                            new ArrayList<>(allLabels),
+                            original.subscriberCount(),
+                            original.viewCount(),
+                            original.lastVideoDate());
                 })
                 .collect(Collectors.toList());
     }

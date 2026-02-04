@@ -1,6 +1,7 @@
 package com.hermes.domain.grading;
 
 import java.time.Instant;
+import java.util.List;
 
 /**
  * In-memory YouTube channel statistics for grading.
@@ -11,7 +12,28 @@ public record ChannelStatistics(
         long subscriberCount,
         long viewCount,
         long videoCount,
-        Instant publishedAt) {
+        Instant publishedAt,
+        List<VideoStatistics> recentVideos) {
+
+    /**
+     * Creates ChannelStatistics without video data (for backward compatibility).
+     */
+    public static ChannelStatistics withoutVideos(
+            String channelId,
+            long subscriberCount,
+            long viewCount,
+            long videoCount,
+            Instant publishedAt) {
+        return new ChannelStatistics(channelId, subscriberCount, viewCount, videoCount, publishedAt, null);
+    }
+
+    /**
+     * Checks if video-level statistics are available.
+     */
+    public boolean hasVideoStatistics() {
+        return recentVideos != null && !recentVideos.isEmpty();
+    }
+
     /**
      * Calculates views per subscriber ratio.
      * Returns 0 if subscriber count is 0.

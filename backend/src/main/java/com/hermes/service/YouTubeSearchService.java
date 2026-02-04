@@ -276,12 +276,17 @@ public class YouTubeSearchService {
 
             List<Channel> channels = channelResponse.getItems();
             if (channels != null) {
+                // Fetch last video dates for all channels in batch
+                Map<String, Instant> lastVideoDateMap = fetchLastVideoDatesBatch(uncachedChannelIds, apiKey);
+                quotaUsed += YouTubeQuotaGovernor.SEARCH_LIST_COST; // One search call for all channels
+
                 for (Channel channel : channels) {
-                    CreatorProfile profile = mapToProfile(channel);
+                    Instant lastVideoDate = lastVideoDateMap.get(channel.getId());
+                    CreatorProfile profile = mapToProfile(channel, lastVideoDate);
                     freshProfiles.add(profile);
 
-                    // Cache the channel
-                    CachedChannel cached = CachedChannel.fromChannel(channel);
+                    // Cache the channel with lastVideoDate
+                    CachedChannel cached = CachedChannel.fromChannel(channel, lastVideoDate);
                     channelCache.put(channel.getId(), cached);
                 }
             }
@@ -295,9 +300,49 @@ public class YouTubeSearchService {
     }
 
     /**
+     * Fetches the most recent video upload date for a batch of channels.
+     * Uses a single search.list call with channelId filter to minimize quota.
+     */
+    private Map<String, Instant> fetchLastVideoDatesBatch(List<String> channelIds, String apiKey) {
+        Map<String, Instant> result = new HashMap<>();
+
+        // YouTube API allows filtering by channelId but only one at a time for videos
+        // We'll make individual calls for accuracy, but limit to first 10 channels
+        int maxChannelsToFetch = Math.min(channelIds.size(), 10);
+
+        for (int i = 0; i < maxChannelsToFetch; i++) {
+            String channelId = channelIds.get(i);
+            try {
+                YouTube.Search.List videoSearch = youtube.search().list(List.of("snippet"));
+                videoSearch.setKey(apiKey);
+                videoSearch.setChannelId(channelId);
+                videoSearch.setType(List.of("video"));
+                videoSearch.setOrder("date");
+                videoSearch.setMaxResults(1L);
+
+                SearchListResponse response = videoSearch.execute();
+                List<SearchResult> videos = response.getItems();
+
+                if (videos != null && !videos.isEmpty()) {
+                    var videoSnippet = videos.get(0).getSnippet();
+                    if (videoSnippet.getPublishedAt() != null) {
+                        Instant publishedAt = Instant.ofEpochMilli(videoSnippet.getPublishedAt().getValue());
+                        result.put(channelId, publishedAt);
+                        log.debug("[YouTubeSearch] Last video for {}: {}", channelId, publishedAt);
+                    }
+                }
+            } catch (IOException e) {
+                log.warn("[YouTubeSearch] Failed to fetch last video date for {}: {}", channelId, e.getMessage());
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Maps a YouTube Channel to our internal CreatorProfile domain model.
      */
-    private CreatorProfile mapToProfile(Channel channel) {
+    private CreatorProfile mapToProfile(Channel channel, Instant lastVideoDate) {
         var snippet = channel.getSnippet();
         var stats = channel.getStatistics();
 
@@ -336,7 +381,8 @@ public class YouTubeSearchService {
                 List.of(),
                 snippet.getCountry(),
                 new HashMap<>(),
-                0.0);
+                0.0,
+                lastVideoDate);
     }
 
     /**
@@ -383,9 +429,10 @@ public class YouTubeSearchService {
             long videos,
             long views,
             String country,
-            Instant cachedAt) {
+            Instant cachedAt,
+            Instant lastVideoDate) {
 
-        static CachedChannel fromChannel(Channel channel) {
+        static CachedChannel fromChannel(Channel channel, Instant lastVideoDate) {
             var snippet = channel.getSnippet();
             var stats = channel.getStatistics();
 
@@ -418,7 +465,8 @@ public class YouTubeSearchService {
                     vids,
                     viewCount,
                     snippet.getCountry(),
-                    Instant.now());
+                    Instant.now(),
+                    lastVideoDate);
         }
 
         CreatorProfile toProfile() {
@@ -434,7 +482,8 @@ public class YouTubeSearchService {
                     List.of(),
                     country,
                     new HashMap<>(),
-                    0.0);
+                    0.0,
+                    lastVideoDate);
         }
     }
 

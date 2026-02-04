@@ -91,7 +91,7 @@ public class GradingService {
                 criteria.audienceScale());
 
         double engagementScore = EngagementScorer.score(
-                stats.viewCount(),
+                stats.recentVideos(),
                 stats.subscriberCount(),
                 criteria.engagementQuality());
 
@@ -121,7 +121,10 @@ public class GradingService {
                 creator.getProfileImageUrl(),
                 creator.getPlatform(),
                 score,
-                labels);
+                labels,
+                stats.subscriberCount(),
+                stats.viewCount(),
+                null); // lastVideoDate not available in grading flow
     }
 
     /**
