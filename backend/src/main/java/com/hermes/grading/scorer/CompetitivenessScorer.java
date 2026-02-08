@@ -105,6 +105,10 @@ public final class CompetitivenessScorer {
     /**
      * Gets bucket label from competitiveness score.
      * Buckets are derived dynamically, NOT stored.
+     * 
+     * INVARIANT: Always returns a non-null bucket label.
+     * Full coverage: [0.0, 1.0] maps to {Nascent, Emerging, Growing, Established,
+     * Dominant}
      */
     public static String getBucket(double competitivenessScore) {
         if (competitivenessScore >= THRESHOLD_DOMINANT) {
@@ -116,7 +120,7 @@ public final class CompetitivenessScorer {
         } else if (competitivenessScore >= THRESHOLD_EMERGING) {
             return "Emerging";
         }
-        return null; // Below threshold
+        return "Nascent"; // Covers [0.0, 0.20) - never returns null
     }
 
     /**

@@ -3,6 +3,7 @@ package com.hermes.repository;
 import com.hermes.domain.entity.SearchSessionResult;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,10 +15,12 @@ import java.util.UUID;
 /**
  * Repository for SearchSessionResult.
  * Provides zero-API-call pagination via database slices.
+ * Extends JpaSpecificationExecutor for dynamic filtered queries.
  */
 @Repository
 public interface SearchSessionResultRepository
-                extends JpaRepository<SearchSessionResult, SearchSessionResult.SearchSessionResultId> {
+                extends JpaRepository<SearchSessionResult, SearchSessionResult.SearchSessionResultId>,
+                JpaSpecificationExecutor<SearchSessionResult> {
 
         /**
          * Offset-based pagination (simple, works for most cases).

@@ -75,6 +75,7 @@ public final class BucketMapper {
 
     public static ScoreRange competitivenessRange(String bucket) {
         return switch (bucket.toLowerCase()) {
+            case "nascent" -> new ScoreRange(0.0, 0.20); // NEW: covers gap
             case "emerging" -> new ScoreRange(0.20, 0.40);
             case "growing" -> new ScoreRange(0.40, 0.60);
             case "established" -> new ScoreRange(0.60, 0.80);

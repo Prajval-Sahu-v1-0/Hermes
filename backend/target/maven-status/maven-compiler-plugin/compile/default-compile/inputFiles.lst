@@ -33,6 +33,7 @@ D:\Documents\Hermes\backend\src\main\java\com\hermes\feature\FeatureFlag.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\service\QueryGenerationService.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\service\ScoringEngine.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\governor\TokenGovernor.java
+D:\Documents\Hermes\backend\src\main\java\com\hermes\repository\specification\SearchSessionResultSpecification.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\domain\dto\SearchRequest.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\service\filter\BucketMapper.java
 D:\Documents\Hermes\backend\src\main\java\com\hermes\domain\entity\Creator.java

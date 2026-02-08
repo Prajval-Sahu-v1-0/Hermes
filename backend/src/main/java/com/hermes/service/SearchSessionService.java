@@ -187,6 +187,9 @@ public class SearchSessionService {
             double competitiveness = CompetitivenessScorer.computeFromScore(creator.score());
             result.setCompetitivenessScore(competitiveness);
 
+            // Store freshness score (computed during grading, persisted here)
+            result.setFreshness(creator.score().freshness());
+
             // Store raw subscriber count for "Most Subscribers" sorting
             result.setSubscriberCount(creator.subscriberCount());
 
@@ -319,7 +322,7 @@ public class SearchSessionService {
                     sessionId, PageRequest.of(page, pageSize));
             case ENGAGEMENT -> resultRepository.findBySessionIdOrderByEngagementDesc(
                     sessionId, PageRequest.of(page, pageSize));
-            case ACTIVITY -> resultRepository.findBySessionIdOrderByActivityDesc(
+            case ACTIVITY -> resultRepository.findBySessionIdOrderByActivityDesc( // Sorts by last_video_date (recency)
                     sessionId, PageRequest.of(page, pageSize));
             case COMPETITIVENESS -> resultRepository.findBySessionIdOrderByCompetitivenessDesc(
                     sessionId, PageRequest.of(page, pageSize));
@@ -364,7 +367,7 @@ public class SearchSessionService {
      * @param filters   Multi-select filter criteria
      * @return Filtered, sorted, paginated results
      */
-    @Transactional(readOnly = true)
+    @Transactional // Not readOnly - touchSession() requires UPDATE for sliding expiration
     public FilteredSessionPage paginateFiltered(
             UUID sessionId,
             int page,
@@ -389,36 +392,30 @@ public class SearchSessionService {
             touchSession(sessionId);
         }
 
-        // 2. Fetch all results for this session (for filtering)
-        List<SearchSessionResult> allResults = resultRepository.findBySessionIdOrderByRank(sessionId);
+        // 2. Build specification from filter criteria (database-level filtering)
+        var specification = com.hermes.repository.specification.SearchSessionResultSpecification
+                .fromCriteria(sessionId, filters);
 
-        // 3. Apply filters (if any)
-        List<SearchSessionResult> filteredResults = allResults;
-        if (filters != null && !filters.isEmpty()) {
-            filteredResults = applyFiltersInMemory(allResults, filters);
-        }
+        // 3. Build pageable with sort (database-level sorting)
+        org.springframework.data.domain.Sort sort = sortKeyToSort(sortKey);
+        org.springframework.data.domain.Pageable pageable = PageRequest.of(page, pageSize, sort);
 
-        // 4. Apply sorting
-        filteredResults = sortResults(filteredResults, sortKey);
+        // 4. Execute FILTER → SORT → PAGINATE in database (single query)
+        org.springframework.data.domain.Page<SearchSessionResult> resultPage = resultRepository.findAll(specification,
+                pageable);
 
-        // 5. Apply pagination
-        int totalFiltered = filteredResults.size();
-        int totalPages = (int) Math.ceil((double) totalFiltered / pageSize);
-        int startIndex = page * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, totalFiltered);
+        // 5. Count query uses SAME specification for correctness
+        long totalFiltered = resultPage.getTotalElements();
+        int totalPages = resultPage.getTotalPages();
 
-        List<SearchSessionResult> pagedResults = startIndex < totalFiltered
-                ? filteredResults.subList(startIndex, endIndex)
-                : List.of();
-
-        log.debug("[Session] Filtered pagination session={} sortKey={} page={} total={} filtered={}",
-                sessionId, sortKey, page, allResults.size(), totalFiltered);
+        log.debug("[Session] DB-filtered pagination session={} sortKey={} page={} filtered={}",
+                sessionId, sortKey, page, totalFiltered);
 
         return new FilteredSessionPage(
                 sessionId,
                 session.getNormalizedQuery(),
-                pagedResults,
-                totalFiltered,
+                resultPage.getContent(),
+                (int) totalFiltered,
                 totalPages,
                 page,
                 pageSize,
@@ -429,80 +426,33 @@ public class SearchSessionService {
     }
 
     /**
-     * Applies filters in memory using OR within category, AND across categories.
+     * Converts SortKey enum to Spring Data Sort.
+     * Sorting is FULLY DB-AUTHORITATIVE - no fallback in-memory sorting.
+     * 
+     * NOTE: ACTIVITY SortKey semantic mismatch is intentionally not addressed
+     * in this change set. Currently sorts by lastVideoDate (recency).
      */
-    private List<SearchSessionResult> applyFiltersInMemory(
-            List<SearchSessionResult> results,
-            com.hermes.domain.dto.FilterCriteria filters) {
-
-        return results.stream()
-                .filter(r -> passesAllFilters(r, filters))
-                .collect(java.util.stream.Collectors.toList());
-    }
-
-    private boolean passesAllFilters(SearchSessionResult r, com.hermes.domain.dto.FilterCriteria f) {
-        // Audience
-        if (f.audience() != null && !f.audience().isEmpty()) {
-            if (!com.hermes.service.filter.BucketMapper.matchesAnyAudienceBucket(r.getAudienceFit(), f.audience())) {
-                return false;
-            }
-        }
-        // Engagement
-        if (f.engagement() != null && !f.engagement().isEmpty()) {
-            if (!com.hermes.service.filter.BucketMapper.matchesAnyEngagementBucket(r.getEngagementQuality(),
-                    f.engagement())) {
-                return false;
-            }
-        }
-        // Competitiveness
-        if (f.competitiveness() != null && !f.competitiveness().isEmpty()) {
-            if (!com.hermes.service.filter.BucketMapper.matchesAnyCompetitivenessBucket(r.getCompetitivenessScore(),
-                    f.competitiveness())) {
-                return false;
-            }
-        }
-        // Activity
-        if (f.activity() != null && !f.activity().isEmpty()) {
-            if (!com.hermes.service.filter.BucketMapper.matchesAnyActivityBucket(r.getActivityConsistency(),
-                    f.activity())) {
-                return false;
-            }
-        }
-        // Genres (check labels)
-        if (f.genres() != null && !f.genres().isEmpty()) {
-            String[] labels = r.getLabels();
-            if (labels == null || labels.length == 0)
-                return false;
-            java.util.Set<String> lowerGenres = f.genres().stream()
-                    .map(String::toLowerCase)
-                    .collect(java.util.stream.Collectors.toSet());
-            boolean hasMatch = java.util.Arrays.stream(labels)
-                    .map(String::toLowerCase)
-                    .anyMatch(lowerGenres::contains);
-            if (!hasMatch)
-                return false;
-        }
-        return true;
-    }
-
-    /**
-     * Sorts results in memory by the specified sort key.
-     */
-    private List<SearchSessionResult> sortResults(List<SearchSessionResult> results, SortKey sortKey) {
-        java.util.Comparator<SearchSessionResult> comparator = switch (sortKey) {
-            case FINAL_SCORE -> java.util.Comparator.comparingDouble(SearchSessionResult::getScore).reversed();
-            case RELEVANCE -> java.util.Comparator.comparingDouble(SearchSessionResult::getGenreRelevance).reversed();
-            case SUBSCRIBERS -> java.util.Comparator.comparingLong(SearchSessionResult::getSubscriberCount).reversed();
-            case ENGAGEMENT ->
-                java.util.Comparator.comparingDouble(SearchSessionResult::getEngagementQuality).reversed();
-            case ACTIVITY ->
-                java.util.Comparator.comparing(
-                        SearchSessionResult::getLastVideoDate,
-                        java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()));
-            case COMPETITIVENESS ->
-                java.util.Comparator.comparingDouble(SearchSessionResult::getCompetitivenessScore).reversed();
+    private org.springframework.data.domain.Sort sortKeyToSort(SortKey sortKey) {
+        return switch (sortKey) {
+            case FINAL_SCORE -> org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Order.desc("score"),
+                    org.springframework.data.domain.Sort.Order.asc("rank"));
+            case RELEVANCE -> org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Order.desc("genreRelevance"),
+                    org.springframework.data.domain.Sort.Order.asc("rank"));
+            case SUBSCRIBERS -> org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Order.desc("subscriberCount"),
+                    org.springframework.data.domain.Sort.Order.asc("rank"));
+            case ENGAGEMENT -> org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Order.desc("engagementQuality"),
+                    org.springframework.data.domain.Sort.Order.asc("rank"));
+            case ACTIVITY -> org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Order.desc("lastVideoDate").nullsLast(),
+                    org.springframework.data.domain.Sort.Order.asc("rank"));
+            case COMPETITIVENESS -> org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Order.desc("competitivenessScore"),
+                    org.springframework.data.domain.Sort.Order.asc("rank"));
         };
-        return results.stream().sorted(comparator).collect(java.util.stream.Collectors.toList());
     }
 
     /**

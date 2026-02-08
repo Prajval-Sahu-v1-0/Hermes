@@ -61,7 +61,9 @@ public class SortingService {
             case RELEVANCE -> resultRepository.findBySessionIdOrderByRelevanceDesc(sessionId, pageable);
             case SUBSCRIBERS -> resultRepository.findBySessionIdOrderBySubscribersDesc(sessionId, pageable);
             case ENGAGEMENT -> resultRepository.findBySessionIdOrderByEngagementDesc(sessionId, pageable);
-            case ACTIVITY -> resultRepository.findBySessionIdOrderByActivityDesc(sessionId, pageable);
+            case ACTIVITY -> resultRepository.findBySessionIdOrderByActivityDesc(sessionId, pageable); // Sorts by
+                                                                                                       // last_video_date
+                                                                                                       // (recency)
             case COMPETITIVENESS -> resultRepository.findBySessionIdOrderByCompetitivenessDesc(sessionId, pageable);
         };
     }

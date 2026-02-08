@@ -14,24 +14,39 @@ import java.util.stream.Collectors;
 /**
  * Service for applying multi-select filters to session results.
  * 
- * FILTERING RULES:
- * - OR logic within the same category (pass if ANY selected bucket matches)
- * - AND logic across categories (must pass ALL active category filters)
+ * @deprecated Use
+ *             {@link com.hermes.repository.specification.SearchSessionResultSpecification}
+ *             for database-level filtering instead. This service performs
+ *             in-memory filtering
+ *             which is less efficient and has been superseded by JPA
+ *             Specification-based
+ *             filtering in SearchSessionService.paginateFiltered().
  * 
- * INVARIANTS (NON-NEGOTIABLE):
- * - Operates on precomputed, stored statistics ONLY
- * - NO YouTube API calls
- * - NO LLM calls
- * - NO recomputation
- * - NO re-ranking
- * - Session-scoped, read-only
+ *             This class remains for backward compatibility with any code that
+ *             still uses
+ *             in-memory filtering. New code MUST NOT use this service.
  * 
- * EXECUTION ORDER:
- * 1. Resolve SearchSession
- * 2. Apply multi-select filters (this service)
- * 3. Apply sorting
- * 4. Apply pagination
+ *             FILTERING RULES:
+ *             - OR logic within the same category (pass if ANY selected bucket
+ *             matches)
+ *             - AND logic across categories (must pass ALL active category
+ *             filters)
+ * 
+ *             INVARIANTS (NON-NEGOTIABLE):
+ *             - Operates on precomputed, stored statistics ONLY
+ *             - NO YouTube API calls
+ *             - NO LLM calls
+ *             - NO recomputation
+ *             - NO re-ranking
+ *             - Session-scoped, read-only
+ * 
+ *             EXECUTION ORDER:
+ *             1. Resolve SearchSession
+ *             2. Apply multi-select filters (this service)
+ *             3. Apply sorting
+ *             4. Apply pagination
  */
+@Deprecated(since = "1.1", forRemoval = true)
 @Service
 public class FilterService {
 

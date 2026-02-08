@@ -53,6 +53,9 @@ public class SearchSessionResult {
     @Column(name = "competitiveness_score")
     private double competitivenessScore;
 
+    @Column(name = "freshness")
+    private double freshness;
+
     @Column(name = "subscriber_count")
     private long subscriberCount;
 
@@ -173,6 +176,14 @@ public class SearchSessionResult {
 
     public void setCompetitivenessScore(double competitivenessScore) {
         this.competitivenessScore = competitivenessScore;
+    }
+
+    public double getFreshness() {
+        return freshness;
+    }
+
+    public void setFreshness(double freshness) {
+        this.freshness = freshness;
     }
 
     public long getSubscriberCount() {

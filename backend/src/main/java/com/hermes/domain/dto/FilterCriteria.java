@@ -35,7 +35,7 @@ public record FilterCriteria(
 
         /**
          * Competitiveness tier buckets (multi-select).
-         * Values: "emerging", "growing", "established", "dominant"
+         * Values: "nascent", "emerging", "growing", "established", "dominant"
          * Backed by: competitiveness_score
          */
         Set<String> competitiveness,

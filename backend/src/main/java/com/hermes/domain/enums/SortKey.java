@@ -26,10 +26,13 @@ public enum SortKey {
     RELEVANCE("genre_relevance", "Relevance"),
 
     /**
-     * Sort by subscriber/audience fit score.
-     * Column: audience_fit
+     * Sort by raw subscriber count (highest first).
+     * Column: subscriber_count
+     * 
+     * NOTE: This sorts by the raw subscriber number, NOT by the
+     * audience_fit score which measures preference matching.
      */
-    SUBSCRIBERS("audience_fit", "Subscribers"),
+    SUBSCRIBERS("subscriber_count", "Subscribers"),
 
     /**
      * Sort by engagement quality score.
@@ -38,10 +41,14 @@ public enum SortKey {
     ENGAGEMENT("engagement_quality", "Engagement"),
 
     /**
-     * Sort by upload/activity consistency score.
-     * Column: activity_consistency
+     * Sort by recency of last video upload (most recently active first).
+     * Column: last_video_date
+     * 
+     * NOTE: This sorts by the actual date of the most recent video,
+     * NOT by the activity_consistency score (upload frequency).
+     * Use this to find creators who have uploaded content recently.
      */
-    ACTIVITY("activity_consistency", "Activity"),
+    ACTIVITY("last_video_date", "Recently Active"),
 
     /**
      * Sort by competitiveness score (derived metric).
